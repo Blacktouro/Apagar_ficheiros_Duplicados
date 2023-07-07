@@ -1,0 +1,43 @@
+import hashlib
+from pathlib import Path
+import os
+
+ 
+def compute_hash(file_path):
+    with open(file_path, 'rb') as f:
+        hash_obj = hashlib.md5()
+        hash_obj.update(f.read())
+        return hash_obj.hexdigest()
+ 
+def find_duplicate(root_path):
+    hashes = {}
+    duplicates = []  # Adiciona esta linha para inicializar a lista de duplicatas
+    for file_path in root_path.rglob('*'):
+        if file_path.is_file():
+            hash_value = compute_hash(file_path)
+            if hash_value in hashes:
+                print(f'Duplicate file found: {file_path}')
+                print(f'Original file: {hashes[hash_value]}')
+                duplicates.append(file_path)
+            else:
+                hashes[hash_value] = file_path
+
+
+
+    if duplicates:
+        confirmation = input('Do you want to delete the duplicate files? (Y/N): ')
+        if confirmation.lower() == 'y':
+            for file_path in duplicates:
+                print(f'Removing duplicate file: {file_path}')
+                os.remove(file_path)
+            print('Duplicate files have been removed.')
+        else:
+            print('Duplicate files were not deleted.')
+    else:
+        print('No duplicate files found.')
+
+ 
+if __name__ == '__main__':
+    folder_name = input("Digite o nome da pasta: ")
+    root_path = Path(folder_name)
+    find_duplicate(root_path)
